@@ -60,7 +60,7 @@ wire [15:0] wIBufRdDt1;
     
         // Port B (Read port)
         .clkb   (PL_CLK_100MHZ),         
-        .enb    (wIBufRdEn && !buf_sel_rd && wEnClk),
+        .enb    (wIBufRdEn && !buf_sel_rd),
         .addrb  (wIBufRdAddr), 
         .doutb  (wIBufRdDt0)   
     );
@@ -75,7 +75,7 @@ wire [15:0] wIBufRdDt1;
     
         // Port B (Read port)
         .clkb   (PL_CLK_100MHZ),         
-        .enb    (wIBufRdEn && buf_sel_rd && wEnClk),    
+        .enb    (wIBufRdEn && buf_sel_rd),    
         .addrb  (wIBufRdAddr), 
         .doutb  (wIBufRdDt1)   
     );
