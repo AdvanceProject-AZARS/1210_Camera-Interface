@@ -96,17 +96,12 @@ module CamBufRd (
 		r_wIBufRdEn    <= 1'b0;
 		r_wIBufRdAddr  <= rd_cnt;
 		buf0_empty_rd  <= 1'b0;
-		buf1_empty_rd  <= 1'b0;
-		r_buf_sel_rd   <= 1'b0; end
+		buf1_empty_rd  <= 1'b0; end
 		
-		else if (wEnClk) begin //mo
+		else if (wEnClk) begin
 			case (c_state)
 				R_IDLE: begin
 					r_wIBufRdEn   <= 1'b0;
-					if (pulse_buf0_full_wr)
-						r_buf_sel_rd <= 1'b0;
-					else if (pulse_buf1_full_wr)
-						r_buf_sel_rd <= 1'b1;
 				end
 				R_RUN: begin
 					r_wIBufRdEn   <= 1'b1;   
@@ -121,10 +116,9 @@ module CamBufRd (
 					else begin
 						buf1_empty_rd <= 1'b1;
 						buf0_empty_rd <= 1'b0; end
-				end
+				end		
 				default: begin
-					r_wIBufRdEn <= 1'b0;
-				end
+					r_wIBufRdEn <= 1'b0; end
 			endcase
 	end
 end
@@ -132,7 +126,20 @@ end
 	assign wIBufRdEn = r_wIBufRdEn;  
 	assign wIBufRdAddr = r_wIBufRdAddr;  
 	
-	
+    // MODIFIED, CDC Problem 	
+    always @(posedge iClk or negedge wRsn) begin
+        if (!wRsn) begin
+            r_buf_sel_rd <= 1'b0;
+        end else begin
+            if (c_state == R_IDLE) begin
+                if (sync0_ff2)      //2-Cycle Delayed buf0full
+                    r_buf_sel_rd <= 1'b0;
+                else if (sync1_ff2) //2-Cycle Delayed buf1full
+                    r_buf_sel_rd <= 1'b1;
+            end
+        end
+    end	
+        
 	
 // Counter for Read Enable Signal
 	always @(posedge iClk or negedge wRsn) begin
